@@ -8,6 +8,8 @@ export interface Lead {
     linkedin?: string | null;
     twitter?: string | null;
     facebook?: string | null;
+    headcount?: string | null;
+    industry?: string | null;
   };
   location: {
     country: string;

@@ -74,6 +74,16 @@ export class Card {
             </div>
           `}
 
+          ${lead.company.industry || lead.company.headcount ? `
+            <div class="hs-card-meta">
+              ${lead.company.industry ? `<span class="hs-meta-tag">${lead.company.industry}</span>` : ''}
+              ${lead.company.headcount ? `<span class="hs-meta-tag">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12" style="display:inline; vertical-align:middle; margin-right:2px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                ${lead.company.headcount}
+              </span>` : ''}
+            </div>
+          ` : ''}
+
           <div class="hs-card-socials">
             ${lead.company.linkedin ? `
               <a href="${lead.company.linkedin}" target="_blank" rel="noopener noreferrer" class="hs-social-link" title="LinkedIn">

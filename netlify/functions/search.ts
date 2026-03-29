@@ -68,7 +68,9 @@ export const handler: Handler = async (event, context) => {
           website: org.website_url || null,
           linkedin: org.linkedin_url || null,
           twitter: org.twitter_url || null,
-          facebook: org.facebook_url || null
+          facebook: org.facebook_url || null,
+          headcount: org.estimated_num_employees ? `${org.estimated_num_employees}+` : null,
+          industry: org.industry || null
         },
         location: {
           country: org.country || params.country,
@@ -121,7 +123,9 @@ function generateMockFallback(params: SearchParams): Lead[] {
         domain: domain,
         website: `https://www.${domain}`,
         linkedin: `https://linkedin.com/company/${domain.split('.')[0]}`,
-        twitter: `https://twitter.com/${domain.split('.')[0]}`
+        twitter: `https://twitter.com/${domain.split('.')[0]}`,
+        headcount: `${Math.floor(Math.random() * 500) + 10} Employees`,
+        industry: params.domain.charAt(0).toUpperCase() + params.domain.slice(1)
       },
       location: { country: params.country, city: params.city },
       email: `${fn.toLowerCase()}.${ln.toLowerCase()}@${domain}`,

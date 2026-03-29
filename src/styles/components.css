@@ -403,6 +403,25 @@
   color: var(--text-tertiary);
 }
 
+.hs-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.hs-meta-tag {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+  padding: 0.125rem 0.625rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
 .hs-card-footer {
   margin-top: auto;
   padding-top: 1rem;
