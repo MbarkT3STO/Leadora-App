@@ -139,7 +139,72 @@ export const handler: Handler = async (event, context) => {
       });
     }
 
-    // Final sorting and filtering
+    // Specialized Regional and National Hubs for Morocco
+    if (params.country.toLowerCase() === 'morocco' || params.country.toLowerCase() === 'maroc') {
+      const query = params.keywords || params.domain || 'job';
+      
+      allJobs.push({
+        id: `regional-anapec-${Math.random().toString(36).substring(7)}`,
+        title: `ANAPEC Official Scour: ${query}`,
+        companyName: 'ANAPEC (National Agency)',
+        location: params.city || 'National',
+        descriptionSnippet: `ANAPEC is the official Moroccan agency for job placement. Scour the latest government-verified roles specifically in ${params.city || 'Morocco'}.`,
+        url: `http://www.anapec.org/emplois/recherche?q=${encodeURIComponent(query)}`,
+        postedAt: 'Official Scour',
+        source: 'ANAPEC Hub',
+        tags: ['National Agency', 'Verified']
+      });
+
+      allJobs.push({
+        id: `regional-public-${Math.random().toString(36).substring(7)}`,
+        title: `Emploi Public: Government Career Scout`,
+        companyName: 'Emploi-Public.ma',
+        location: 'Maroc (National)',
+        descriptionSnippet: `The official portal for government and public sector recruitment in the Kingdom of Morocco. A must-scour for administrative, educational, and medical roles.`,
+        url: `https://www.emploi-public.ma/ar/index.asp`,
+        postedAt: 'Government Hub',
+        source: 'Emploi-Public',
+        tags: ['Public Sector', 'Official']
+      });
+
+      allJobs.push({
+        id: `regional-wadifa-${Math.random().toString(36).substring(7)}`,
+        title: `Al Wadifa Maroc: Deep Scour ${query}`,
+        companyName: 'Al Wadifa Maroc Hub',
+        location: 'Morocco',
+        descriptionSnippet: `One of the most exhaustive job aggregators in the Kingdom. Get the latest private and public sector offers for ${query} role.`,
+        url: `https://www.alwadifa-maroc.com/search?q=${encodeURIComponent(query)}`,
+        postedAt: 'Instant Scour',
+        source: 'Al Wadifa Hub',
+        tags: ['Mega-Aggregator', 'Localized']
+      });
+
+      allJobs.push({
+        id: `regional-bayt-${Math.random().toString(36).substring(7)}`,
+        title: `Explore ${query} openings: Bayt Morocco Hub`,
+        companyName: 'Bayt.com (MENA Leader)',
+        location: params.city || 'Morocco',
+        descriptionSnippet: `Bayt is the #1 job site in the MENA region. Scour thousands of active roles in Morocco matching your criteria.`,
+        url: `https://www.bayt.com/en/morocco/jobs/${encodeURIComponent(query)}-jobs/`,
+        postedAt: 'Live Now',
+        source: 'Bayt Regional Hub',
+        tags: ['Regional Hub', 'MENA Leader']
+      });
+
+      allJobs.push({
+        id: `regional-rekrute-${Math.random().toString(36).substring(7)}`,
+        title: `ReKrute: High-impact ${query} roles`,
+        companyName: 'ReKrute Morocco',
+        location: params.city || 'Casablanca, Morocco',
+        descriptionSnippet: `A specialized Moroccan platform for professional and management roles. Deep scour for ${query} careers in the French/Arabic market.`,
+        url: `https://www.rekrute.com/recherche-offres-emploi-maroc.html?keyword=${encodeURIComponent(query)}`,
+        postedAt: '24h Recency',
+        source: 'ReKrute Morocco',
+        tags: ['Morocco Expert', 'Top Source']
+      });
+    }
+
+    // Sort by most recent
     allJobs = allJobs.slice(0, 100);
 
     return {
