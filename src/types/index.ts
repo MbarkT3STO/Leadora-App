@@ -28,6 +28,28 @@ export interface SearchParams {
   deepSearch: boolean;
 }
 
+export interface Job {
+  id: string;
+  title: string;
+  companyName: string;
+  location: string;
+  salary?: string | null;
+  descriptionSnippet: string;
+  url: string;
+  postedAt: string;
+  source: string;
+  tags?: string[];
+}
+
+export interface JobSearchParams {
+  country: string;
+  city: string;
+  domain: string;
+  keywords: string;
+}
+
+export type SearchMode = 'LEADS' | 'JOBS';
+
 export interface APIResponse<T> {
   data: T | null;
   error: string | null;

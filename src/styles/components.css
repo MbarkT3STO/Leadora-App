@@ -303,6 +303,58 @@ input:checked + .hs-slider:before {
 
 .hs-search-header p {
   color: var(--text-secondary);
+}
+
+.hs-search-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 0.5rem;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid var(--border-color);
+}
+
+.hs-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.hs-tab svg {
+  color: var(--text-tertiary);
+  transition: color var(--transition-fast);
+}
+
+.hs-tab:hover {
+  color: var(--text-primary);
+  background-color: rgba(var(--hs-hue), 100%, 65%, 0.05);
+}
+
+.hs-tab.active {
+  background-color: var(--bg-primary);
+  color: var(--brand-primary);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.hs-tab.active svg {
+  color: var(--brand-primary);
+}
+
+.hs-search-header p {
+  color: var(--text-secondary);
   font-size: 1.05rem;
 }
 
@@ -518,15 +570,62 @@ input:checked + .hs-slider:before {
   letter-spacing: 0.05em;
 }
 
-.hs-sources-list {
-  font-style: italic;
-  opacity: 0.8;
+.hs-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-.hs-card-footer {
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px dashed var(--border-color);
+.hs-user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Job Card Specfic */
+.hs-job-card {
+  border-left: 4px solid var(--brand-primary);
+}
+
+.hs-job-description {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 1.25rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.hs-job-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hs-job-posted {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-left: auto;
+}
+
+.hs-text-success {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.hs-source-badge {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
 .hs-card-socials {

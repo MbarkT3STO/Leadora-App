@@ -1,7 +1,7 @@
 import { SearchForm } from '../modules/search/SearchForm';
 import { ResultsGrid } from '../modules/results/ResultsGrid';
 import { ApiService } from '../services/api';
-import type { SearchParams } from '../types';
+import type { SearchParams, JobSearchParams, SearchMode } from '../types';
 
 export class App {
   private container: HTMLElement;
@@ -30,14 +30,13 @@ export class App {
         </div>
         <div class="hs-nav-actions">
           <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
-            <!-- Icon initialized by Main -->
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
           </button>
           
-          <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--bg-secondary); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; color: var(--text-secondary); overflow: hidden;">
-            <img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          <div class="hs-user-avatar">
+            <img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Avatar">
           </div>
         </div>
       </header>
@@ -55,29 +54,37 @@ export class App {
       </main>
     `;
 
-    // Attach event listeners after content is injected mapping IDs properly
     this.searchForm.attachEvents('search-container');
     this.resultsGrid.attachEvents('results-container');
   }
 
-  private async handleSearch(params: SearchParams) {
+  private async handleSearch(mode: SearchMode, params: any) {
     try {
       this.searchForm.setLoading(true);
-      this.resultsGrid.showLoading();
+      this.resultsGrid.showLoading(mode);
       
-      const response = await ApiService.searchLeads(params);
-      
-      this.searchForm.setLoading(false);
-      
-      if (response.error || !response.data) {
-        this.resultsGrid.showError('Search Failed', response.error || 'An unknown error occurred');
-        return;
+      if (mode === 'LEADS') {
+        const response = await ApiService.searchLeads(params as SearchParams);
+        this.searchForm.setLoading(false);
+        this.resultsGrid.hideLoading();
+        
+        if (response.error || !response.data) {
+          this.resultsGrid.showError('Search Failed', response.error || 'Check your Apollo API configuration.');
+          return;
+        }
+        this.resultsGrid.updateLeadResults(response.data);
+      } else {
+        const response = await ApiService.searchJobs(params as JobSearchParams);
+        this.searchForm.setLoading(false);
+        this.resultsGrid.hideLoading();
+        
+        if (response.error || !response.data) {
+          this.resultsGrid.showError('Search Failed', response.error || 'Failed to scour job sites.');
+          return;
+        }
+        this.resultsGrid.updateJobResults(response.data);
       }
       
-      this.resultsGrid.hideLoading();
-      this.resultsGrid.updateResults(response.data);
-      
-      // Scroll to results seamlessly
       const resultsSection = document.getElementById('hs-results-section');
       if (resultsSection) {
         resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -86,7 +93,7 @@ export class App {
     } catch (e) {
       console.error(e);
       this.searchForm.setLoading(false);
-      this.resultsGrid.showError('Application Error', 'Something went wrong while executing the search.');
+      this.resultsGrid.showError('Error', 'Something went wrong while executing the search.');
     }
   }
 }

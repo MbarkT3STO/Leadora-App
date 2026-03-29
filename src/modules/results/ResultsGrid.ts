@@ -1,9 +1,12 @@
-import type { Lead } from '../../types';
+import type { Lead, Job } from '../../types';
 import { Card } from '../../components/Card';
+import { JobCard } from '../../components/JobCard';
 
 export class ResultsGrid {
   private container: HTMLElement | null = null;
   private currentLeads: Lead[] = [];
+  private currentJobs: Job[] = [];
+  private currentMode: 'LEADS' | 'JOBS' = 'LEADS';
 
   render(): string {
     return `
@@ -31,7 +34,7 @@ export class ResultsGrid {
       
       <div id="hs-loading-overlay" class="hs-loading-state" style="display: none;">
         <div class="spinner"></div>
-        <p>Scanning global database...</p>
+        <p id="hs-loading-text">Scanning global database...</p>
       </div>
 
       <div id="hs-error-state" class="hs-error-state" style="display: none;">
@@ -50,7 +53,6 @@ export class ResultsGrid {
     this.container = document.getElementById(containerId);
     if (!this.container) return;
 
-    // Attach delegated events for the cards (e.g. Copy Email buttons)
     this.container.addEventListener('click', this.handleGlobalActions.bind(this));
   }
 
@@ -60,7 +62,8 @@ export class ResultsGrid {
     // Handle Export Button
     const exportBtn = target.closest('#hs-export-btn');
     if (exportBtn) {
-      this.exportToCSV();
+      if (this.currentMode === 'LEADS') this.exportToCSV();
+      else this.exportJobsToCSV();
       return;
     }
 
@@ -74,12 +77,9 @@ export class ResultsGrid {
     if (email) {
       try {
         await navigator.clipboard.writeText(email);
-        
-        // Visual feedback
         const originalText = btn.innerHTML;
         btn.innerHTML = `<span class="hs-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Copied!`;
         btn.classList.add('hs-btn--success');
-        
         setTimeout(() => {
           btn.innerHTML = originalText;
           btn.classList.remove('hs-btn--success');
@@ -92,7 +92,6 @@ export class ResultsGrid {
 
   private exportToCSV() {
     if (this.currentLeads.length === 0) return;
-
     const headers = ['Name', 'Email', 'Phone', 'Company', 'Domain', 'Website', 'Country', 'City', 'LinkedIn'];
     const rows = this.currentLeads.map(lead => [
       lead.name,
@@ -105,7 +104,25 @@ export class ResultsGrid {
       lead.location.city,
       lead.company.linkedin || ''
     ]);
+    this.downloadCSV(headers, rows, 'leads');
+  }
 
+  private exportJobsToCSV() {
+    if (this.currentJobs.length === 0) return;
+    const headers = ['Title', 'Company', 'Location', 'Salary', 'Source', 'URL', 'Posted'];
+    const rows = this.currentJobs.map(job => [
+      job.title,
+      job.companyName,
+      job.location,
+      job.salary || '',
+      job.source,
+      job.url,
+      job.postedAt
+    ]);
+    this.downloadCSV(headers, rows, 'jobs');
+  }
+
+  private downloadCSV(headers: string[], rows: any[][], type: string) {
     const csvContent = [
       headers.join(','),
       ...rows.map(row => row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(','))
@@ -115,32 +132,32 @@ export class ResultsGrid {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `leadora_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `leadora_${type}_export_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   }
 
-  showLoading() {
+  showLoading(mode: 'LEADS' | 'JOBS' = 'LEADS') {
     if (!this.container) return;
     const section = this.container.querySelector('#hs-results-section') as HTMLElement;
     const loading = this.container.querySelector('#hs-loading-overlay') as HTMLElement;
     const errorState = this.container.querySelector('#hs-error-state') as HTMLElement;
     const grid = this.container.querySelector('#hs-results-grid') as HTMLElement;
     const countEl = this.container.querySelector('#hs-results-count') as HTMLElement;
+    const loadingText = this.container.querySelector('#hs-loading-text') as HTMLElement;
     
     if (errorState) errorState.style.display = 'none';
     if (loading) loading.style.display = 'flex';
+    if (loadingText) loadingText.textContent = mode === 'LEADS' ? 'Scanning global lead database...' : 'Sourcing job offers from free websites...';
     
-    // Show skeletons in the background
     if (section && grid) {
-      if (countEl) countEl.textContent = 'Searching Leads...';
+      if (countEl) countEl.textContent = mode === 'LEADS' ? 'Searching Leads...' : 'Scouring Jobs...';
       grid.innerHTML = Array.from({ length: 12 }).map(() => Card.renderSkeleton()).join('');
       section.style.display = 'block';
-      // Disable export button while loading
       const exportBtn = this.container.querySelector('#hs-export-btn') as HTMLButtonElement;
-      if (exportBtn) exportBtn.disabled = true;
+      if (exportBtn) exportBtn.style.display = 'none';
     }
   }
 
@@ -163,30 +180,55 @@ export class ResultsGrid {
     if (errorState) errorState.style.display = 'flex';
   }
 
-  updateResults(leads: Lead[]) {
+  updateLeadResults(leads: Lead[]) {
     if (!this.container) return;
     this.currentLeads = leads;
+    this.currentMode = 'LEADS';
     
     const section = this.container.querySelector('#hs-results-section') as HTMLElement;
     const grid = this.container.querySelector('#hs-results-grid') as HTMLElement;
     const countEl = this.container.querySelector('#hs-results-count') as HTMLElement;
+    const exportBtn = this.container.querySelector('#hs-export-btn') as HTMLButtonElement;
     
     if (!section || !grid || !countEl) return;
     
     if (leads.length === 0) {
-      this.showError('No leads found', 'We could not find any leads matching your criteria. Try adjusting the industry or domain.');
+      this.showError('No leads found', 'Try adjusting your filters.');
       return;
     }
 
     countEl.textContent = `Found ${leads.length} Lead${leads.length !== 1 ? 's' : ''}`;
-    
-    // Inject rendered cards
     grid.innerHTML = leads.map(l => Card.render(l)).join('');
-    
     section.style.display = 'block';
+    if (exportBtn) {
+      exportBtn.style.display = 'inline-flex';
+      exportBtn.disabled = false;
+    }
+  }
+
+  updateJobResults(jobs: Job[]) {
+    if (!this.container) return;
+    this.currentJobs = jobs;
+    this.currentMode = 'JOBS';
     
-    // Enable export button
+    const section = this.container.querySelector('#hs-results-section') as HTMLElement;
+    const grid = this.container.querySelector('#hs-results-grid') as HTMLElement;
+    const countEl = this.container.querySelector('#hs-results-count') as HTMLElement;
     const exportBtn = this.container.querySelector('#hs-export-btn') as HTMLButtonElement;
-    if (exportBtn) exportBtn.disabled = false;
+    
+    if (!section || !grid || !countEl) return;
+    
+    if (jobs.length === 0) {
+      this.showError('No jobs found', 'We could not find any job offers matching your criteria.');
+      return;
+    }
+
+    countEl.textContent = `Scoured ${jobs.length} Job Offer${jobs.length !== 1 ? 's' : ''}`;
+    grid.innerHTML = jobs.map(j => JobCard.render(j)).join('');
+    section.style.display = 'block';
+    if (exportBtn) {
+      exportBtn.style.display = 'inline-flex';
+      exportBtn.disabled = false;
+    }
   }
 }

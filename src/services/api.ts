@@ -1,4 +1,4 @@
-import type { Lead, SearchParams, APIResponse } from '../types';
+import type { Lead, Job, SearchParams, JobSearchParams, APIResponse } from '../types';
 
 export class ApiService {
   /**
@@ -9,26 +9,33 @@ export class ApiService {
     try {
       const response = await fetch('/.netlify/functions/search', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
       });
 
-      if (!response.ok) {
-        throw new Error(`Integration error! Status: ${response.status}`);
-      }
-
-      // Return the typed payload sent from the serverless function
+      if (!response.ok) throw new Error(`Integration error! Status: ${response.status}`);
       return await response.json() as APIResponse<Lead[]>;
 
     } catch (e) {
       console.error('Frontend ApiService Error:', e);
-      return {
-        data: null,
-        error: 'Failed to contact the search provider. Ensure your API Key is correctly configured.',
-        status: 500
-      };
+      return { data: null, error: 'Failed to contact the search provider.', status: 500 };
+    }
+  }
+
+  static async searchJobs(params: JobSearchParams): Promise<APIResponse<Job[]>> {
+    try {
+      const response = await fetch('/.netlify/functions/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      });
+
+      if (!response.ok) throw new Error(`Jobs Integration error! Status: ${response.status}`);
+      return await response.json() as APIResponse<Job[]>;
+
+    } catch (e) {
+      console.error('Frontend Jobs API Error:', e);
+      return { data: null, error: 'Failed to scour job offers from sources.', status: 500 };
     }
   }
 }
