@@ -77,7 +77,7 @@ export const handler: Handler = async (event, context) => {
           city: org.city || params.city
         },
         email: fallbackEmail,
-        phone: org.phone || org.primary_phone || null,
+        phone: extractPhone(org),
         avatar: org.logo_url || null
       };
     });
@@ -104,6 +104,17 @@ export const handler: Handler = async (event, context) => {
     };
   }
 };
+
+function extractPhone(org: any): string | null {
+  const p = org.phone || org.primary_phone;
+  if (!p) return null;
+  if (typeof p === 'string') return p;
+  if (typeof p === 'number') return String(p);
+  if (typeof p === 'object') {
+    return p.number || p.formatted_number || p.phone || JSON.stringify(p);
+  }
+  return null;
+}
 
 function generateMockFallback(params: SearchParams): Lead[] {
   const firstNames = ['Sarah', 'David', 'Michael', 'Emma', 'James', 'Elena', 'Robert'];
