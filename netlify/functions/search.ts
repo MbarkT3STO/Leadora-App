@@ -61,7 +61,7 @@ export const handler: Handler = async (event, context) => {
       
       return {
         id: org.id || Math.random().toString(36).substr(2, 9),
-        name: `Contact`,
+        name: `Primary Contact`,
         company: {
           name: orgName,
           domain: org.primary_domain || '',
@@ -75,6 +75,7 @@ export const handler: Handler = async (event, context) => {
           city: org.city || params.city
         },
         email: fallbackEmail,
+        phone: org.phone || org.primary_phone || null,
         avatar: org.logo_url || null
       };
     });
@@ -124,6 +125,7 @@ function generateMockFallback(params: SearchParams): Lead[] {
       },
       location: { country: params.country, city: params.city },
       email: `${fn.toLowerCase()}.${ln.toLowerCase()}@${domain}`,
+      phone: `+1 (555) 00${i}-${1000 + i}`,
       avatar: null
     };
   });

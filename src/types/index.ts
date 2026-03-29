@@ -14,6 +14,7 @@ export interface Lead {
     city: string;
   };
   email: string | null;
+  phone: string | null;
   avatar: string | null;
 }
 
