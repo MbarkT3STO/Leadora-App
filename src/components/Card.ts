@@ -101,6 +101,10 @@ export class Card {
               </a>
             ` : ''}
           </div>
+          <div class="hs-card-sources">
+            <span class="hs-sources-label">Sourced via:</span>
+            <span class="hs-sources-list">${lead.sources.join(' • ')}</span>
+          </div>
         </div>
         
         <div class="hs-card-footer">

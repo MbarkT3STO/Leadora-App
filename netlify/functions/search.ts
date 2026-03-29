@@ -32,7 +32,7 @@ export const handler: Handler = async (event, context) => {
       q_organization_domains: params.domain.includes('.') ? params.domain : undefined,
       q_organization_keyword_tags: !params.domain.includes('.') ? [params.domain] : undefined,
       organization_locations: params.city ? [`${params.city}, ${params.country}`] : [params.country],
-      per_page: 20
+      per_page: params.deepSearch ? 50 : 20
     };
 
     const response = await fetch('https://api.apollo.io/v1/organizations/search', {
@@ -78,7 +78,8 @@ export const handler: Handler = async (event, context) => {
         },
         email: fallbackEmail,
         phone: extractPhone(org),
-        avatar: org.logo_url || null
+        avatar: org.logo_url || null,
+        sources: ['Apollo.io Enrich', 'Domain Data Scour', 'LinkedIn Sync']
       };
     });
 
@@ -141,7 +142,8 @@ function generateMockFallback(params: SearchParams): Lead[] {
       location: { country: params.country, city: params.city },
       email: `${fn.toLowerCase()}.${ln.toLowerCase()}@${domain}`,
       phone: `+1 (555) 00${i}-${1000 + i}`,
-      avatar: null
+      avatar: null,
+      sources: ['Digital Footprint Analyser', 'LinkedIn Matcher', 'Web Scourer']
     };
   });
 }

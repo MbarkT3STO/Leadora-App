@@ -18,12 +18,14 @@ export interface Lead {
   email: string | null;
   phone: string | null;
   avatar: string | null;
+  sources: string[];
 }
 
 export interface SearchParams {
   country: string;
   city: string;
   domain: string;
+  deepSearch: boolean;
 }
 
 export interface APIResponse<T> {

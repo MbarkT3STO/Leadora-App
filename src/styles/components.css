@@ -62,9 +62,87 @@
 .hs-form-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 1.5rem;
   margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.hs-deep-search-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+/* The switch - the box around the slider */
+.hs-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Hide default HTML checkbox */
+.hs-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.hs-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--border-color);
+  transition: .4s;
+  border-radius: 20px;
+}
+
+.hs-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .hs-slider {
+  background-color: var(--brand-primary);
+}
+
+input:focus + .hs-slider {
+  box-shadow: 0 0 1px var(--brand-primary);
+}
+
+input:checked + .hs-slider:before {
+  transform: translateX(16px);
+}
+
+.hs-toggle-labels {
+  display: flex;
+  flex-direction: column;
+}
+
+.hs-toggle-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hs-toggle-desc {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
 }
 
 .hs-recent-searches {
@@ -420,6 +498,29 @@
   border: 1px solid var(--border-color);
   text-transform: uppercase;
   letter-spacing: 0.025em;
+}
+
+.hs-card-sources {
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hs-sources-label {
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hs-sources-list {
+  font-style: italic;
+  opacity: 0.8;
 }
 
 .hs-card-footer {

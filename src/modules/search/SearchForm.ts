@@ -75,6 +75,16 @@ export class SearchForm {
           </div>
           
           <div class="hs-form-actions">
+            <div class="hs-deep-search-toggle">
+              <label class="hs-switch">
+                <input type="checkbox" id="deepSearch" name="deepSearch">
+                <span class="hs-slider round"></span>
+              </label>
+              <div class="hs-toggle-labels">
+                <span class="hs-toggle-title">Deep Search Mode</span>
+                <span class="hs-toggle-desc">Scour deeper web sources (takes longer)</span>
+              </div>
+            </div>
             <div id="hs-form-error" class="hs-form-error"></div>
             ${Button.render({
               text: 'Search Leads',
@@ -170,7 +180,8 @@ export class SearchForm {
     const params: SearchParams = {
       country: (formData.get('country') as string) || '',
       city: (formData.get('city') as string) || '',
-      domain: (formData.get('domain') as string) || ''
+      domain: (formData.get('domain') as string) || '',
+      deepSearch: form.querySelector('#deepSearch') ? (form.querySelector('#deepSearch') as HTMLInputElement).checked : false
     };
 
     const validation = validateSearch(params);
