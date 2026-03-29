@@ -65,7 +65,10 @@ export const handler: Handler = async (event, context) => {
         company: {
           name: orgName,
           domain: org.primary_domain || '',
-          website: org.website_url || null
+          website: org.website_url || null,
+          linkedin: org.linkedin_url || null,
+          twitter: org.twitter_url || null,
+          facebook: org.facebook_url || null
         },
         location: {
           country: org.country || params.country,
@@ -115,7 +118,9 @@ function generateMockFallback(params: SearchParams): Lead[] {
       company: {
         name: companyName,
         domain: domain,
-        website: `https://www.${domain}`
+        website: `https://www.${domain}`,
+        linkedin: `https://linkedin.com/company/${domain.split('.')[0]}`,
+        twitter: `https://twitter.com/${domain.split('.')[0]}`
       },
       location: { country: params.country, city: params.city },
       email: `${fn.toLowerCase()}.${ln.toLowerCase()}@${domain}`,

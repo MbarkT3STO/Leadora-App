@@ -5,6 +5,9 @@ export interface Lead {
     name: string;
     domain: string;
     website: string | null;
+    linkedin?: string | null;
+    twitter?: string | null;
+    facebook?: string | null;
   };
   location: {
     country: string;

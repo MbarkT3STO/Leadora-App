@@ -330,6 +330,24 @@
   border-top: 1px dashed var(--border-color);
 }
 
+.hs-card-socials {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.hs-social-link {
+  color: var(--text-tertiary);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  display: flex;
+  align-items: center;
+}
+
+.hs-social-link:hover {
+  color: var(--brand-primary);
+  transform: translateY(-2px);
+}
+
 .hs-copy-btn-wrapper {
   width: 100%;
 }
