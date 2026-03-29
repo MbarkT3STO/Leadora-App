@@ -92,50 +92,26 @@ export const handler: Handler = async (event, context) => {
       (params.country?.toLowerCase() === 'united states' || params.country?.toLowerCase() === 'usa') ? fetchUSAJobs(params) : Promise.resolve([])
     ]);
 
+    // Merge all successful results
     let allJobs: Job[] = [];
     results.forEach(res => {
       if (res.status === 'fulfilled') allJobs = [...allJobs, ...res.value];
     });
 
-    // If no real results, or very few, add a 'Deep Scout' path for LinkedIn/Indeed
-    if (allJobs.length < 10) {
+    // Add LinkedIn Mirror results if results are thin
+    if (allJobs.length < 5) {
       const query = params.keywords || params.domain || 'job';
       const loc = params.city ? `${params.city}, ${params.country}` : params.country;
-      
       allJobs.push({
-        id: `scout-linkedin-${Math.random().toString(36).substring(7)}`,
-        title: `Scout ${query} roles on LinkedIn ${params.country}`,
-        companyName: 'LinkedIn Intelligence',
-        location: loc,
-        descriptionSnippet: `Deep scour LinkedIn's live database for jobs matching "${query}" in this region. This is a recommended deep search for ${params.country}.`,
-        url: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(query)}&location=${encodeURIComponent(loc)}`,
-        postedAt: 'Live Now',
-        source: 'LinkedIn Intelligence',
-        tags: ['Deep Scout', 'Live Search']
-      });
-
-      allJobs.push({
-        id: `scout-indeed-${Math.random().toString(36).substring(7)}`,
-        title: `Indeed Live Sc scour: ${query}`,
-        companyName: 'Indeed Hub',
-        location: loc,
-        descriptionSnippet: `Execute a real-time scour on Indeed for ${query} positions in ${loc}. Redirects to localized Indeed search engine.`,
-        url: `https://www.indeed.com/jobs?q=${encodeURIComponent(query)}&l=${encodeURIComponent(loc)}`,
-        postedAt: 'Real-time',
-        source: 'Indeed Scourer',
-        tags: ['Deep Scour', 'Localized']
-      });
-
-      allJobs.push({
-        id: `scout-google-${Math.random().toString(36).substring(7)}`,
-        title: `Google Jobs Scour: ${query}`,
-        companyName: 'Google Search Hub',
-        location: loc,
-        descriptionSnippet: `Tap into Google's primary job index for ${query} roles. Best for discovering roles from niche career pages and smaller job boards in ${loc}.`,
-        url: `https://www.google.com/search?q=${encodeURIComponent(query + ' jobs in ' + loc)}&ibp=htl;jobs`,
-        postedAt: 'Omni-Scour',
-        source: 'Google Search',
-        tags: ['Global Index', 'Search']
+        id: `mirror-linkedin-${Math.random().toString(36).substring(7)}`,
+        title: `View more ${query} roles on LinkedIn`,
+        companyName: 'LinkedIn',
+        location: loc || 'Global',
+        descriptionSnippet: `Explore additional ${query} opportunities on LinkedIn for ${loc || 'your region'}.`,
+        url: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(query)}&location=${encodeURIComponent(loc || '')}`,
+        postedAt: 'Live',
+        source: 'LinkedIn Mirror',
+        tags: ['External', 'Mirror']
       });
     }
 
