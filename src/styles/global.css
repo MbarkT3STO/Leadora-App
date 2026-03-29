@@ -1,0 +1,186 @@
+:root {
+  /* Dynamic Palette Definitions */
+  --hs-hue: 220; /* Primary brand hue (blueish) */
+
+  /* Light Theme Colors */
+  --bg-primary: hsl(0, 0%, 100%);
+  --bg-secondary: hsl(var(--hs-hue), 10%, 98%);
+  --bg-overlay: rgba(255, 255, 255, 0.8);
+  
+  --text-primary: hsl(var(--hs-hue), 20%, 10%);
+  --text-secondary: hsl(var(--hs-hue), 10%, 40%);
+  --text-tertiary: hsl(var(--hs-hue), 5%, 60%);
+  
+  --border-color: hsl(var(--hs-hue), 20%, 90%);
+  --border-focus: hsl(var(--hs-hue), 100%, 65%);
+  
+  --brand-primary: hsl(var(--hs-hue), 90%, 55%);
+  --brand-primary-hover: hsl(var(--hs-hue), 90%, 45%);
+  
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025);
+  
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme='dark'] {
+  --bg-primary: hsl(var(--hs-hue), 20%, 8%);
+  --bg-secondary: hsl(var(--hs-hue), 20%, 12%);
+  --bg-overlay: rgba(14, 18, 25, 0.8);
+  
+  --text-primary: hsl(var(--hs-hue), 10%, 95%);
+  --text-secondary: hsl(var(--hs-hue), 10%, 75%);
+  --text-tertiary: hsl(var(--hs-hue), 10%, 55%);
+  
+  --border-color: hsl(var(--hs-hue), 20%, 20%);
+  
+  --brand-primary: hsl(var(--hs-hue), 80%, 60%);
+  --brand-primary-hover: hsl(var(--hs-hue), 80%, 70%);
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -2px rgba(0,0,0,0.25);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  transition: background-color var(--transition-base), color var(--transition-base);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Base Form Elements Reset */
+input, button, select, textarea {
+  font-family: inherit;
+  font-size: 100%;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+a {
+  color: var(--brand-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* App Header Styling */
+.hs-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hs-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.hs-logo svg {
+  width: 24px;
+  height: 24px;
+  color: var(--brand-primary);
+}
+
+.hs-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.theme-toggle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Layout Utilities */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.main-content {
+  flex: 1;
+  padding: 3rem 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--transition-base) forwards;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--brand-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}

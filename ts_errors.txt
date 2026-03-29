@@ -1,0 +1,9 @@
+src/components/Card.ts(1,10): error TS1484: 'Company' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/core/app.ts(4,10): error TS1484: 'SearchParams' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/modules/results/ResultsGrid.ts(1,10): error TS1484: 'Company' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/modules/search/SearchForm.ts(3,10): error TS1484: 'SearchParams' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/services/api.ts(1,10): error TS1484: 'Company' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/services/api.ts(1,19): error TS1484: 'SearchParams' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/services/api.ts(1,33): error TS1484: 'APIResponse' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/services/api.ts(4,7): error TS6133: 'mockDomains' is declared but its value is never read.
+src/utils/validators.ts(1,10): error TS1484: 'SearchParams' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
