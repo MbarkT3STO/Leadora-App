@@ -1,6 +1,71 @@
 import type { Handler } from '@netlify/functions';
 import type { Job, JobSearchParams, APIResponse } from '../../src/types';
 
+async function fetchGoogleCareers(params: JobSearchParams): Promise<Job[]> {
+  try {
+    // Official Google Careers internal API
+    const query = encodeURIComponent(params.keywords || params.domain || 'software');
+    const location = encodeURIComponent(params.city || params.country || '');
+    const url = `https://careers.google.com/api/v1/jobs/search/?q=${query}&location=${location}&page_size=20`;
+    
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36' }
+    });
+    
+    if (!res.ok) return [];
+    const data = await res.json();
+    const jobs = data.jobs || [];
+    
+    return jobs.map((gj: any) => ({
+      id: `google-${gj.id.split('/')[1] || gj.id}`,
+      title: gj.title,
+      companyName: 'Google',
+      location: gj.locations[0]?.display || 'Global',
+      descriptionSnippet: gj.description.substring(0, 180).replace(/<[^>]*>/g, '') + '...',
+      url: `https://www.google.com/about/careers/applications/jobs/results/${gj.id.split('/')[1] || gj.id}`,
+      postedAt: 'Live',
+      source: 'Google Careers',
+      tags: [gj.category, 'Big Tech']
+    }));
+  } catch (e) {
+    console.error('Google Careers Error:', e);
+    return [];
+  }
+}
+
+async function fetchJooble(params: JobSearchParams, key: string): Promise<Job[]> {
+  try {
+    const url = `https://jooble.org/api/${key}`;
+    const query = params.keywords || params.domain || 'job';
+    const location = params.city ? `${params.city}, ${params.country}` : params.country;
+    
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ keywords: query, location: location })
+    });
+    
+    if (!res.ok) return [];
+    const data = await res.json();
+    
+    return (data.jobs || []).map((j: any) => ({
+      id: `jooble-${j.id}`,
+      title: j.title.replace(/<[^>]*>/g, ''),
+      companyName: j.company || 'Confidential',
+      location: j.location,
+      salary: j.salary || 'Competitive',
+      descriptionSnippet: j.snippet.replace(/<[^>]*>/g, '').substring(0, 180) + '...',
+      url: j.link,
+      postedAt: 'Live',
+      source: 'Jooble Hub',
+      tags: ['Aggregated', 'Global']
+    }));
+  } catch (e) {
+    console.error('Jooble Error:', e);
+    return [];
+  }
+}
+
 export const handler: Handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
     return {
@@ -13,16 +78,17 @@ export const handler: Handler = async (event, context) => {
     if (!event.body) throw new Error('Request body is empty');
     const params: JobSearchParams = JSON.parse(event.body);
 
-    console.log('MAX scouring for jobs:', params);
-
     const ADZUNA_ID = process.env.ADZUNA_APP_ID || '';
     const ADZUNA_KEY = process.env.ADZUNA_APP_KEY || '';
+    const JOOBLE_KEY = process.env.JOOBLE_API_KEY || '';
 
-    // Parallel fetch from all available real-world sources
+    // Parallel fetch from all available real-world sources including GOOGLE and JOOBLE
     const results = await Promise.allSettled([
       fetchArbeitnow(params),
       fetchRemotive(params),
+      fetchGoogleCareers(params),
       (ADZUNA_ID && ADZUNA_KEY) ? fetchAdzuna(params, ADZUNA_ID, ADZUNA_KEY) : Promise.resolve([]),
+      (JOOBLE_KEY) ? fetchJooble(params, JOOBLE_KEY) : Promise.resolve([]),
       (params.country?.toLowerCase() === 'united states' || params.country?.toLowerCase() === 'usa') ? fetchUSAJobs(params) : Promise.resolve([])
     ]);
 
@@ -30,6 +96,48 @@ export const handler: Handler = async (event, context) => {
     results.forEach(res => {
       if (res.status === 'fulfilled') allJobs = [...allJobs, ...res.value];
     });
+
+    // If no real results, or very few, add a 'Deep Scout' path for LinkedIn/Indeed
+    if (allJobs.length < 10) {
+      const query = params.keywords || params.domain || 'job';
+      const loc = params.city ? `${params.city}, ${params.country}` : params.country;
+      
+      allJobs.push({
+        id: `scout-linkedin-${Math.random().toString(36).substring(7)}`,
+        title: `Scout ${query} roles on LinkedIn ${params.country}`,
+        companyName: 'LinkedIn Intelligence',
+        location: loc,
+        descriptionSnippet: `Deep scour LinkedIn's live database for jobs matching "${query}" in this region. This is a recommended deep search for ${params.country}.`,
+        url: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(query)}&location=${encodeURIComponent(loc)}`,
+        postedAt: 'Live Now',
+        source: 'LinkedIn Intelligence',
+        tags: ['Deep Scout', 'Live Search']
+      });
+
+      allJobs.push({
+        id: `scout-indeed-${Math.random().toString(36).substring(7)}`,
+        title: `Indeed Live Sc scour: ${query}`,
+        companyName: 'Indeed Hub',
+        location: loc,
+        descriptionSnippet: `Execute a real-time scour on Indeed for ${query} positions in ${loc}. Redirects to localized Indeed search engine.`,
+        url: `https://www.indeed.com/jobs?q=${encodeURIComponent(query)}&l=${encodeURIComponent(loc)}`,
+        postedAt: 'Real-time',
+        source: 'Indeed Scourer',
+        tags: ['Deep Scour', 'Localized']
+      });
+
+      allJobs.push({
+        id: `scout-google-${Math.random().toString(36).substring(7)}`,
+        title: `Google Jobs Scour: ${query}`,
+        companyName: 'Google Search Hub',
+        location: loc,
+        descriptionSnippet: `Tap into Google's primary job index for ${query} roles. Best for discovering roles from niche career pages and smaller job boards in ${loc}.`,
+        url: `https://www.google.com/search?q=${encodeURIComponent(query + ' jobs in ' + loc)}&ibp=htl;jobs`,
+        postedAt: 'Omni-Scour',
+        source: 'Google Search',
+        tags: ['Global Index', 'Search']
+      });
+    }
 
     // Final sorting and filtering
     allJobs = allJobs.slice(0, 100);
@@ -39,7 +147,7 @@ export const handler: Handler = async (event, context) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         data: allJobs,
-        error: allJobs.length === 0 ? 'No job offers found after scouring all sources. Try broadening your keywords.' : null,
+        error: null,
         status: 200
       } as APIResponse<Job[]>)
     };
@@ -69,10 +177,7 @@ async function fetchAdzuna(params: JobSearchParams, id: string, key: string): Pr
     };
     
     const countryCode = countryMap[params.country.toLowerCase()];
-    if (!countryCode) {
-       console.log(`Adzuna does not support ${params.country}. Skipping...`);
-       return [];
-    }
+    if (!countryCode) return [];
     
     const query = encodeURIComponent(params.keywords || params.domain || 'job');
     const location = encodeURIComponent(params.city || '');
