@@ -59,6 +59,71 @@
 }
 
 /* Buttons */
+.hs-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.hs-recent-searches {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hs-history-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.hs-history-list {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.hs-history-chip {
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.hs-history-chip:hover {
+  background-color: var(--bg-primary);
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+  transform: translateY(-1px);
+}
+
+.hs-history-clear {
+  padding: 0.375rem;
+  border-radius: var(--radius-md);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hs-history-clear:hover {
+  background-color: hsla(0, 100%, 50%, 0.1);
+  color: #ff4d4d;
+}
+
 .hs-btn {
   display: inline-flex;
   align-items: center;
@@ -87,13 +152,16 @@
 }
 
 .hs-btn--primary {
-  background-color: var(--brand-primary);
+  background: var(--brand-gradient);
   color: white;
+  box-shadow: 0 4px 14px 0 hsla(var(--hs-hue), 100%, 65%, 0.3);
 }
 
-.hs-btn--primary:hover:not(:disabled) {
-  background-color: var(--brand-primary-hover);
-  transform: translateY(-1px);
+.hs-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 hsla(var(--hs-hue), 100%, 65%, 0.5);
+  background: var(--brand-gradient);
+  filter: brightness(1.1);
 }
 
 .hs-btn--secondary {
@@ -125,12 +193,23 @@
 
 /* Form layout */
 .hs-search-section {
-  background: var(--bg-primary);
-  border-radius: var(--radius-xl);
-  padding: 2.5rem;
-  box-shadow: var(--shadow-lg);
-  margin-bottom: 3rem;
-  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-bottom: 2px solid var(--border-color);
+  padding: 4rem 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.hs-search-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--brand-gradient);
 }
 
 .hs-search-header {

@@ -6,9 +6,34 @@ import { validateSearch } from '../../utils/validators';
 export class SearchForm {
   private container: HTMLElement | null = null;
   private onSubmitCallback: (params: SearchParams) => void;
+  private history: SearchParams[] = [];
 
   constructor(onSubmit: (params: SearchParams) => void) {
     this.onSubmitCallback = onSubmit;
+    this.loadHistory();
+  }
+
+  private loadHistory() {
+    try {
+      const stored = localStorage.getItem('leadora_history');
+      if (stored) {
+        this.history = JSON.parse(stored);
+      }
+    } catch (e) {
+      this.history = [];
+    }
+  }
+
+  private saveHistory(params: SearchParams) {
+    // Keep only unique searches, max 5
+    const key = `${params.domain}|${params.country}|${params.city}`.toLowerCase();
+    this.history = [
+      params,
+      ...this.history.filter(p => `${p.domain}|${p.country}|${p.city}`.toLowerCase() !== key)
+    ].slice(0, 5);
+
+    localStorage.setItem('leadora_history', JSON.stringify(this.history));
+    this.renderHistory();
   }
 
   render(): string {
@@ -60,8 +85,37 @@ export class SearchForm {
             })}
           </div>
         </form>
+
+        <div id="hs-recent-searches" class="hs-recent-searches">
+          ${this.getHistoryHtml()}
+        </div>
       </section>
     `;
+  }
+
+  private getHistoryHtml(): string {
+    if (this.history.length === 0) return '';
+    
+    return `
+      <span class="hs-history-label">Recent:</span>
+      <div class="hs-history-list" id="hs-history-list">
+        ${this.history.map((p, i) => `
+          <button class="hs-history-chip" data-index="${i}" title="${p.domain} in ${p.country}">
+            ${p.domain}${p.city ? ` (${p.city})` : ''}
+          </button>
+        `).join('')}
+        <button id="hs-clear-history" class="hs-history-clear" title="Clear all history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+      </div>
+    `;
+  }
+
+  private renderHistory() {
+    const historyContainer = this.container?.querySelector('#hs-recent-searches');
+    if (historyContainer) {
+      historyContainer.innerHTML = this.getHistoryHtml();
+    }
   }
 
   attachEvents(containerId: string) {
@@ -72,6 +126,37 @@ export class SearchForm {
     if (form) {
       form.addEventListener('submit', (e) => this.handleSubmit(e, form));
     }
+
+    this.container.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      
+      const chip = target.closest('.hs-history-chip') as HTMLButtonElement;
+      if (chip) {
+        const index = parseInt(chip.getAttribute('data-index') || '0');
+        const params = this.history[index];
+        this.fillFormAndSubmit(params);
+        return;
+      }
+
+      const clearBtn = target.closest('#hs-clear-history');
+      if (clearBtn) {
+        this.history = [];
+        localStorage.removeItem('leadora_history');
+        this.renderHistory();
+      }
+    });
+  }
+
+  private fillFormAndSubmit(params: SearchParams) {
+    if (!this.container) return;
+    const form = this.container.querySelector('#hs-search-form') as HTMLFormElement;
+    if (!form) return;
+
+    (form.querySelector('#domain') as HTMLInputElement).value = params.domain;
+    (form.querySelector('#country') as HTMLInputElement).value = params.country;
+    (form.querySelector('#city') as HTMLInputElement).value = params.city;
+
+    this.handleSubmit(new Event('submit'), form);
   }
 
   private handleSubmit(e: Event, form: HTMLFormElement) {
@@ -92,12 +177,12 @@ export class SearchForm {
     
     if (!validation.valid && errorEl) {
       errorEl.textContent = validation.message || 'Invalid input';
-      // Add shake animation class momentarily
       errorEl.classList.add('shake');
       setTimeout(() => errorEl.classList.remove('shake'), 400);
       return;
     }
 
+    this.saveHistory(params);
     this.onSubmitCallback(params);
   }
 

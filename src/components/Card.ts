@@ -101,4 +101,25 @@ export class Card {
       </article>
     `;
   }
+
+  static renderSkeleton(): string {
+    return `
+      <div class="hs-card hs-card--skeleton">
+        <div class="hs-card-header">
+          <div class="hs-lead-info" style="width: 100%;">
+            <div class="skeleton" style="height: 1.25rem; width: 60%; margin-bottom: 0.5rem;"></div>
+            <div class="skeleton" style="height: 0.875rem; width: 40%;"></div>
+          </div>
+        </div>
+        <div class="hs-card-body">
+          <div class="skeleton" style="height: 0.75rem; width: 90%; margin-bottom: 0.75rem;"></div>
+          <div class="skeleton" style="height: 0.75rem; width: 80%; margin-bottom: 0.75rem;"></div>
+          <div class="skeleton" style="height: 0.75rem; width: 70%;"></div>
+        </div>
+        <div class="hs-card-footer">
+          <div class="skeleton" style="height: 2.5rem; width: 100%; border-radius: var(--radius-md);"></div>
+        </div>
+      </div>
+    `;
+  }
 }
