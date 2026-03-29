@@ -55,9 +55,24 @@ export const handler: Handler = async (event, context) => {
 
 async function fetchAdzuna(params: JobSearchParams, id: string, key: string): Promise<Job[]> {
   try {
-    // Adzuna supports multiple countries: us, gb, ca, au, etc.
-    const countryMap: { [key: string]: string } = { 'united states': 'us', 'usa': 'us', 'united kingdom': 'gb', 'uk': 'gb', 'canada': 'ca' };
-    const countryCode = countryMap[params.country.toLowerCase()] || 'us';
+    // Adzuna officially supports these countries
+    const countryMap: { [key: string]: string } = { 
+      'united states': 'us', 'usa': 'us', 
+      'united kingdom': 'gb', 'uk': 'gb', 
+      'canada': 'ca', 'australia': 'au',
+      'france': 'fr', 'germany': 'de', 'austria': 'at',
+      'belgium': 'be', 'brazil': 'br', 'switzerland': 'ch',
+      'spain': 'es', 'india': 'in', 'italy': 'it',
+      'mexico': 'mx', 'netherlands': 'nl', 'new zealand': 'nz',
+      'poland': 'pl', 'russia': 'ru', 'saudi arabia': 'sa',
+      'singapore': 'sg', 'south africa': 'za'
+    };
+    
+    const countryCode = countryMap[params.country.toLowerCase()];
+    if (!countryCode) {
+       console.log(`Adzuna does not support ${params.country}. Skipping...`);
+       return [];
+    }
     
     const query = encodeURIComponent(params.keywords || params.domain || 'job');
     const location = encodeURIComponent(params.city || '');
