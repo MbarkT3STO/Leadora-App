@@ -111,6 +111,15 @@ export class Card {
           <div class="hs-copy-btn-wrapper" data-email="${lead.email || ''}">
             ${emailAction}
           </div>
+          <button class="hs-btn hs-btn--outline enrich-trigger-btn" data-domain="${lead.company.domain}" data-lead-id="${lead.id}" title="Enrich company data" aria-label="Enrich ${lead.company.name}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="11" y1="8" x2="11" y2="14"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
+            Enrich
+          </button>
         </div>
       </article>
     `;

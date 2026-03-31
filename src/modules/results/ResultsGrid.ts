@@ -1,6 +1,7 @@
 import type { Lead, Job } from '../../types';
 import { Card } from '../../components/Card';
 import { JobCard } from '../../components/JobCard';
+import { EnrichModal } from '../../components/EnrichModal';
 
 export class ResultsGrid {
   private container: HTMLElement | null = null;
@@ -53,12 +54,22 @@ export class ResultsGrid {
     this.container = document.getElementById(containerId);
     if (!this.container) return;
 
+    EnrichModal.init();
     this.container.addEventListener('click', this.handleGlobalActions.bind(this));
   }
 
   private async handleGlobalActions(e: Event) {
     const target = e.target as HTMLElement;
-    
+
+    // Handle Enrich button
+    const enrichBtn = target.closest('.enrich-trigger-btn') as HTMLElement | null;
+    if (enrichBtn) {
+      const leadId = enrichBtn.getAttribute('data-lead-id');
+      const lead = this.currentLeads.find(l => l.id === leadId);
+      if (lead) EnrichModal.open(lead);
+      return;
+    }
+
     // Handle Export Button
     const exportBtn = target.closest('#hs-export-btn');
     if (exportBtn) {

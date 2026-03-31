@@ -21,6 +21,19 @@ export interface Lead {
   sources: string[];
 }
 
+export interface EnrichmentData {
+  domain: string;
+  techStack: string[];
+  companyType: string | null;
+  foundedYear: string | null;
+  revenue: string | null;
+  description: string | null;
+  logoUrl: string | null;
+  crunchbase: string | null;
+  alexa_rank: number | null;
+  tags: string[];
+}
+
 export interface SearchParams {
   country: string;
   city: string;

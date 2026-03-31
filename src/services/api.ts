@@ -1,4 +1,4 @@
-import type { Lead, Job, SearchParams, JobSearchParams, APIResponse } from '../types';
+import type { Lead, Job, SearchParams, JobSearchParams, APIResponse, EnrichmentData } from '../types';
 
 export class ApiService {
   /**
@@ -36,6 +36,23 @@ export class ApiService {
     } catch (e) {
       console.error('Frontend Jobs API Error:', e);
       return { data: null, error: 'Failed to scour job offers from sources.', status: 500 };
+    }
+  }
+
+  static async enrichLead(domain: string): Promise<APIResponse<EnrichmentData>> {
+    try {
+      const response = await fetch('/.netlify/functions/enrich', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain }),
+      });
+
+      if (!response.ok) throw new Error(`Enrichment error! Status: ${response.status}`);
+      return await response.json() as APIResponse<EnrichmentData>;
+
+    } catch (e) {
+      console.error('Enrichment API Error:', e);
+      return { data: null, error: 'Failed to enrich company data.', status: 500 };
     }
   }
 }
